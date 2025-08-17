@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "api.API:app", "--host", "0.0.0.0", "--port", "3306"]
+CMD ["uvicorn", "services.data_loader:app", "--host", "0.0.0.0", "--port", "8000"]
