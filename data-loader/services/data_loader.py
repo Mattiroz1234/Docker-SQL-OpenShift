@@ -11,6 +11,7 @@ DB_USER = "root"
 DB_PASS = os.getenv("MYSQL_ROOT_PASSWORD", "pwd")
 DB_NAME = 'testdb'
 
+
 def get_conn():
     return mysql.connector.connect(
         host=DB_HOST,
