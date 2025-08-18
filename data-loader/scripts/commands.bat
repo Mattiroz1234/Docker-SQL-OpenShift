@@ -11,7 +11,7 @@ oc apply -f fastapi-deployment.yaml
 oc apply -f fastapi-service.yaml
 oc apply -f fastapi-route.yaml
 
-# create & insert db
+# create & insert mysql db
 oc cp sql/data_create.sql mysql-8489dbcf89-wwxlr:/tmp/sql.data_create.sql
 oc cp sql/data_insert.sql mysql-8489dbcf89-wwxlr:/tmp/sql.data_insert.sql
 oc exec -it mysql-8489dbcf89-wwxlr -- bash

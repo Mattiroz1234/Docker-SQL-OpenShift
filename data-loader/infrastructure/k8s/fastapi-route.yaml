@@ -7,4 +7,4 @@ spec:
     kind: Service
     name: fastapi-service
   port:
-    targetPort: 80
+    targetPort: 8000

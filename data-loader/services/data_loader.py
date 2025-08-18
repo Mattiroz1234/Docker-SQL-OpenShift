@@ -1,27 +1,37 @@
-from fastapi import FastAPI
-from sqlalchemy import create_engine, text
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+import mysql.connector
+import os
 
 app = FastAPI()
 
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "pwd"
-MYSQL_HOST = "mysql"
-MYSQL_PORT = 3306
-MYSQL_DB = "testdb"
 
-DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+DB_HOST = "mysql"
+DB_PORT = 3306
+DB_USER = "root"
+DB_PASS = os.getenv("MYSQL_ROOT_PASSWORD", "pwd")
+DB_NAME = 'testdb'
 
-engine = create_engine(DATABASE_URL)
-
-class User(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
+def get_conn():
+    return mysql.connector.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME,
+        connection_timeout=8
+    )
 
 @app.get("/users")
-def read_users():
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM data"))
-        users = [User(id=row.id, first_name=row.first_name, last_name=row.last_name) for row in result]
-    return users
+def get_users():
+    try:
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, first_name, last_name FROM data")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return rows
+    except mysql.connector.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
